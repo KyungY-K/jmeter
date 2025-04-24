@@ -50,7 +50,7 @@ pipeline{
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
                     reportDir: "${env.HTML_REPORT_DIR}",
-                    reportfiles: 'index.html',
+                    reportFiles: 'index.html',
                     reportName: 'JMeter Performance Report'
                 )
             }
