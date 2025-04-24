@@ -1,29 +1,27 @@
-pipeline{
+pipeline {
     agent any
 
     environment {
-        JMETER_VERSION = "5.6.3"
-        JMETER_HOME = "/opt/jmeter/apache-jmeter-${JMETER_VERSION}"
+        JMETER_EXEC = "/opt/homebrew/bin/jmeter"
     
-        JTL_REPORT_FILE = "results/results.jtl"   //JTL 생성위치
-        HTML_REPORT_DIR = "results/report_output" //Report HTML 생성위치
+        JTL_REPORT_FILE = "results/results.jtl"
+        HTML_REPORT_DIR = "results/report_output"
     }
 
     stages {
-        stage('Run Tests') {  //단계
-            steps { //실행내용
-                script {    //sh 리눅스 명령어 하겠다.
-                    sh 'rm -rf results' //results 파일을 지운다!!
-                    sh 'rm -f results.jtl'  //파일 타켓팅해서 지운다
-                    sh 'rm -rf report_output'   //폴더 지운다!
-                    //폴더 만들기
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh 'rm -rf results'
+                    sh 'rm -f results.jtl'
+                    sh 'rm -rf report_output'
                     sh 'mkdir -p results'
                     sh 'mkdir -p report_output'
                     sh 'mkdir -p results/report_output'
 
                     sh """
                         echo "시작"
-                        ${env.JMETER_HOME}/bin/jmeter -n \\
+                        ${env.JMETER_EXEC} -n \\
                         -t MyTestPlan.jmx \\
                         -l ./results/results.jtl \\
                         -e -o ./results/report_output
@@ -35,13 +33,12 @@ pipeline{
         stage('퍼포먼스 리포트') {
             steps {
                 perfReport(
-                    sourceDataFiles: "${envJTL_REPORT_FILE}",
+                    sourceDataFiles: "${env.JTL_REPORT_FILE}",
                     errorFailedThreshold: 1,
                     errorUnstableThreshold: 0.5
-
                 )
             }
-        } 
+        }
 
         stage('HTML Report') {
             steps {
